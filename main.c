@@ -160,13 +160,10 @@ int main(void)
 	IWDG_SetReload(10);
 
 
-
 #ifdef POWER_SOURCE_DETECT
 	/* ADC configuration */
 	ADC_Configuration();
 #endif
-
-
 
 	/* USART Configuration */
 	USART_Configuration(57600);
@@ -176,30 +173,35 @@ int main(void)
 	/* USB Init */
 	USB_Init();
 
+        /* Startup blinking */
+        int k;
+        for (k=0; k<3; k++) {
+            GPIO_SetBits(PORT_LED, PIN_LED);
+            Delay(100);
+            GPIO_ResetBits(PORT_LED, PIN_LED);
+	    Delay(100);
+        }
 
-        while (1) {
-            if(GPIO_ReadInputDataBit(GPIOB , GPIO_Pin_8) == Bit_SET ) {
-	            GPIO_SetBits(PORT_LED, PIN_LED);		// LED On modified @new CM-900 with jason 2012-07-24
-                     TxDString("Detect Pin!\r\n");
-            }
-            
- 
-            //TxDString("CM-900 SYSTEM INIT!\r\n");
-            
-            /*
-            if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET || GPIO_ReadInputDataBit(GPIOB , GPIO_Pin_8) == Bit_SET)
-            {
-                    RCC_ClearFlag();
-                    while(bDeviceState != CONFIGURED);  //Wait until USB CDC is fully initialized
+        if(GPIO_ReadInputDataBit(GPIOB , GPIO_Pin_8) == Bit_SET ) {
+                GPIO_SetBits(PORT_LED, PIN_LED);		// LED On modified @new CM-900 with jason 2012-07-24
+                 TxDString("Detect Pin!\r\n");
+        }
+        
 
-                    //TxDString("CM-900 USB CDC CONFIGURED\r\n");
-                    //TxDString("START USB MONITOR\r\n");
-                    SerialMonitor();
-            }
-            */
+        //TxDString("CM-900 SYSTEM INIT!\r\n");
+        
+        if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET || GPIO_ReadInputDataBit(GPIOB , GPIO_Pin_8) == Bit_SET)
+        {
+                RCC_ClearFlag();
+                while(bDeviceState != CONFIGURED);  //Wait until USB CDC is fully initialized
+
+                //TxDString("CM-900 USB CDC CONFIGURED\r\n");
+                //TxDString("START USB MONITOR\r\n");
+                SerialMonitor();
         }
 
 	//TxDString("Jump to application\r\n");
+	UsbVcpDisconnect();
 
 	/* Else case, execute user application that downloaded previously*/
 	pFunction Jump_To_Application;
@@ -506,7 +508,7 @@ void SerialMonitor(void)
 		//bParaNum = StringProcess(bpCommand,ulpParameter,gbpRxBuffer);
 		//bParaNum =1;
 		//if(bParaNum != 0)
-		if(gbCount == IDE_COMMAND_LENGTH && bpCommand[0] == 'A' && bpCommand[2] == '&')
+		if(bpCommand[0] == 'A' && bpCommand[2] == '&')
 		{
 			//if(bParaNum > PARA_NUM) bParaNum = PARA_NUM;
 
@@ -641,8 +643,9 @@ void SerialMonitor(void)
 				Delay(100);
 
 			}
-			else if(StringCompare(bpCommand,"AT&GO"))//else if(StringCompare(bpCommand,"GO")|| StringCompare(bpCommand,"G") || bRxData == 'g' )
+			else if(StringCompare(bpCommand,"AT&RST"))//else if(StringCompare(bpCommand,"GO")|| StringCompare(bpCommand,"G") || bRxData == 'g' )
 			{
+                                USB_TxDString("Running..\n");
 
 				//TxDString("Jump to user application!\r\n");
 				pFunction Jump_To_Application;
@@ -998,16 +1001,6 @@ void RCC_Configuration(void)
 #endif
 						    RCC_APB2Periph_AFIO,
 						    ENABLE);
-
-        while (1) {
-            GPIO_InitTypeDef GPIO_InitStructure;
-            GPIO_InitStructure.GPIO_Pin = PIN_LED;
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
-            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-            GPIO_Init(PORT_LED, &GPIO_InitStructure);
-            GPIO_SetBits(PORT_LED, PIN_LED);		// LED Off
-        }
-
 
 	//add RCC_APB1Periph_USART2 clock @ new CM-900 with jason 2012-07-24
   	RCC_APB1PeriphClockCmd(
