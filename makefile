@@ -104,6 +104,8 @@ $(LIBSTM32_OUT): $(LIBSTM32_OBJS)
 
 $(LIBSTM32_OBJS): stm32f10x_conf.h
 
+install:
+	./stm32loader.py -p /dev/ttyUSB0 -evw main.bin
 
 clean:
 	-rm *.o lib/src/*.o USBCDC/*.o lib/USB_lib/src/*.o  $(LIBSTM32_OUT) $(MAIN_OUT_ELF) $(MAIN_OUT_BIN) $(MAIN_OUT_LSS)
