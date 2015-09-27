@@ -166,9 +166,9 @@ int main(void)
 #endif
 
     /* USART Configuration */
-    USART_Configuration(57600);
-    USART_BUFFER_CLEAR;
-    Delay(70);
+    //USART_Configuration(57600);
+    //USART_BUFFER_CLEAR;
+    //Delay(70);
 
     /* USB Init */
     USB_Init();
