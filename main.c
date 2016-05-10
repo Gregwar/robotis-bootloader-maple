@@ -182,7 +182,7 @@ int main(void)
         Delay(100);
     }
 
-    if(GPIO_ReadInputDataBit(GPIOB , GPIO_Pin_8) == Bit_SET ) {
+    if(GPIO_ReadInputDataBit(GPIOA , GPIO_Pin_14) == Bit_SET ) {
         GPIO_SetBits(PORT_LED, PIN_LED);		// LED On modified @new CM-900 with jason 2012-07-24
         TxDString("Detect Pin!\r\n");
     }
@@ -190,7 +190,7 @@ int main(void)
 
     //TxDString("CM-900 SYSTEM INIT!\r\n");
 
-    if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET || GPIO_ReadInputDataBit(GPIOB , GPIO_Pin_8) == Bit_SET)
+    if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET || GPIO_ReadInputDataBit(GPIOA , GPIO_Pin_14) == Bit_SET)
     {
         RCC_ClearFlag();
         while(bDeviceState != CONFIGURED);  //Wait until USB CDC is fully initialized
@@ -1006,7 +1006,7 @@ void RCC_Configuration(void)
     RCC_APB1PeriphClockCmd(
             RCC_APB1Periph_USB    |
             RCC_APB1Periph_TIM2   |
-            RCC_APB1Periph_USART2 |
+            // RCC_APB1Periph_USART2 |
             RCC_APB1Periph_PWR ,
             ENABLE);
 
@@ -1026,22 +1026,21 @@ void GPIO_Configuration(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;//긴급 복구 모드
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;//긴급 복구 모드
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-    GPIO_SetBits(GPIOB, GPIO_Pin_8);//USB Pull-up must be disabled(go to High) during system power on
-
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_SetBits(GPIOA, GPIO_Pin_14);//USB Pull-up must be disabled(go to High) during system power on
 
     /* Configure USART2 Rx(Alter.F) (PA.3) as input floating */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;//modified by sm.lee 2012-07-24
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    // GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;//modified by sm.lee 2012-07-24
+    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     //	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     /* Configure USART2 Tx(Alter.F) (PA.2) as alternate function push-pull */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;//modified by sm.lee 2012-07-24
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    // GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;//modified by sm.lee 2012-07-24
+    // GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     //	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 #ifdef POWER_SOURCE_DETECT
@@ -1051,6 +1050,11 @@ void GPIO_Configuration(void)
     GPIO_Init(PORT_USB_POWER, &GPIO_InitStructure);
 #endif
     /* Configure LED (PB.2) as output push-pull */
+    GPIO_InitStructure.GPIO_Pin = PIN_LED;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    GPIO_Init(PORT_LED, &GPIO_InitStructure);
+    
     GPIO_InitStructure.GPIO_Pin = PIN_LED;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -1067,7 +1071,7 @@ void GPIO_Configuration(void)
 
     /* Configure USART3 Remap enable */
     //GPIO_PinRemapConfig( GPIO_Remap_USART3, ENABLE);
-    //GPIO_PinRemapConfig( GPIO_Remap_SWJ_Disable, ENABLE); // if you want to use JTAG SWJ(PA14,15...) as GPIO, activate this code
+    GPIO_PinRemapConfig( GPIO_Remap_SWJ_Disable, ENABLE); // if you want to use JTAG SWJ(PA14,15...) as GPIO, activate this code
 }
 
 /*******************************************************************************

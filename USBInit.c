@@ -293,12 +293,12 @@ void USB_Cable_Config (FunctionalState NewState)
    if (NewState != DISABLE)
    {
 	   /*TxDString("USB Pull-up Enabled\r\n");*/
- 	  GPIO_ResetBits(USB_DISCONNECT_PORT, USB_DISCONNECT_PIN);
+ 	  GPIO_SetBits(USB_DISCONNECT_PORT, USB_DISCONNECT_PIN);
    }
    else
    {
 	   /*TxDString("USB Pull-up Disabled\r\n");*/
- 	  GPIO_SetBits(USB_DISCONNECT_PORT, USB_DISCONNECT_PIN);
+ 	  GPIO_ResetBits(USB_DISCONNECT_PORT, USB_DISCONNECT_PIN);
    }
 }
 

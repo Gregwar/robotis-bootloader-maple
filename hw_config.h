@@ -35,8 +35,8 @@
 #define USB_DISCONNECT_PORT                 GPIOB
 #define USB_DISCONNECT_PIN                  GPIO_Pin_9
 
-#define PORT_LED 							GPIOB
-#define PIN_LED  							GPIO_Pin_1
+#define PORT_LED 							GPIOA
+#define PIN_LED  							GPIO_Pin_13
 
 #ifdef POWER_SOURCE_DETECT
 #define PORT_USB_POWER 						GPIOA
