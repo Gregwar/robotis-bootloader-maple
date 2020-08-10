@@ -32,6 +32,9 @@ SECTIONS
     .text :
     {
 	    . = ALIGN(4);
+        
+        KEEP(*(.init))
+        KEEP(*(.fini))
 	    
         *(.text)                   /* remaining code */
         *(.text.*)                   /* remaining code */
